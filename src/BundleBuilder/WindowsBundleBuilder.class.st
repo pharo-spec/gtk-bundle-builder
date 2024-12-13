@@ -1,3 +1,15 @@
+"
+Collectes dependences of a dll list that to make a bundle. 
+
+Example: 
+--------
+```
+WindowsBundleBuilder new
+	basePath: 'c:\msys64\clang64\bin';
+	baseDLLs: #('libgtk-4-1.dll' 'libgtksourceview-5-0.dll');
+	copyAllDependenciesTo: 'gtk4'.
+```
+"
 Class {
 	#name : 'WindowsBundleBuilder',
 	#superclass : 'BundleBuilder',
