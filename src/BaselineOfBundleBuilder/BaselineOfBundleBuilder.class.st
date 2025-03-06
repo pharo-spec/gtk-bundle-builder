@@ -7,7 +7,7 @@ Class {
 
 { #category : 'baselines' }
 BaselineOfBundleBuilder >> baseline: spec [
-	<spec>
+	<basline>
 	
 	spec for: #common do: [  
 		spec package: 'BundleBuilder' ]
