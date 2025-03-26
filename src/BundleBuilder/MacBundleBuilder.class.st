@@ -28,7 +28,7 @@ MacBundleBuilder class >> makeGTK4Bundle [
 
 	self new
 		basePath: '/usr/local/lib';
-		baseDLLs: #('libgtk-4.dylib' 'libgtksourceview-5.dylib');
+		baseDLLs: #('libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib');
 		bundlePath: 'Plugins';
 		copyAllDependenciesTo: 'gtk4';
 		fixRPathsOn: 'gtk4'
