@@ -34,6 +34,18 @@ MacBundleBuilder class >> makeGTK4Bundle [
 		fixRPathsOn: 'gtk4'
 ]
 
+{ #category : 'script' }
+MacBundleBuilder class >> makeGTK4BundleARM [
+	<script>
+
+	self new
+		basePath: '/opt/homebrew/lib';
+		baseDLLs: #('libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib');
+		bundlePath: 'Plugins';
+		copyAllDependenciesTo: 'gtk4';
+		fixRPathsOn: 'gtk4'
+]
+
 { #category : 'accessing' }
 MacBundleBuilder >> bundlePath [
 
