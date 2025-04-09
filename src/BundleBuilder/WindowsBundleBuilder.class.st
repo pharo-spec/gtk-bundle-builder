@@ -22,10 +22,10 @@ WindowsBundleBuilder class >> makeGTK4Bundle [
 	<script>
 
 	self new
-	basePath: 'c:\msys64\clang64\bin';
-	baseDLLs: #('libgtk-4-1.dll' 'libgtksourceview-5-0.dll');
-	copyAllDependenciesTo: 'gtk4'.
-
+		basePath: 'c:\msys64\clang64\bin';
+		baseDLLs: #('libadwaita-1-0.dll' 'libgtk-4-1.dll' 'libgtksourceview-5-0.dll');
+		copyAllDependenciesTo: 'gtk4';
+		copyAll: #('c:/msys64/clang64/share/glib-2.0/schemas/gschemas.compiled') to: 'gtk4'
 ]
 
 { #category : 'private - actions' }

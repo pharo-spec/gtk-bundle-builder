@@ -41,6 +41,15 @@ BundleBuilder >> collectAllDependencies [
 ]
 
 { #category : 'actions' }
+BundleBuilder >> copyAll: aCollection to: aDirectory [
+
+	aCollection do: [ :each | 
+		| ref |
+		ref := each asFileReference.
+		ref copyTo: (aDirectory asFileReference ensureCreateDirectory) / ref basename ]
+]
+
+{ #category : 'actions' }
 BundleBuilder >> copyAllDependenciesTo: aDirectory [
 	
 	self copyAllDependenciesTo: aDirectory override: false
