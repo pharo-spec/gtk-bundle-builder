@@ -28,7 +28,19 @@ MacBundleBuilder class >> makeGTK4Bundle [
 
 	self new
 		basePath: '/usr/local/lib';
-		baseDLLs: #('libgtk-4.dylib' 'libgtksourceview-5.dylib');
+		baseDLLs: #('libadwaita-1.0.dylib' 'libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib');
+		bundlePath: 'Plugins';
+		copyAllDependenciesTo: 'gtk4';
+		fixRPathsOn: 'gtk4'
+]
+
+{ #category : 'script' }
+MacBundleBuilder class >> makeGTK4BundleARM [
+	<script>
+
+	self new
+		basePath: '/opt/homebrew/lib';
+		baseDLLs: #('libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib' 'libadwaita-1.0.dylib');
 		bundlePath: 'Plugins';
 		copyAllDependenciesTo: 'gtk4';
 		fixRPathsOn: 'gtk4'
