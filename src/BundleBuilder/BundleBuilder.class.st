@@ -44,9 +44,11 @@ BundleBuilder >> collectAllDependencies [
 BundleBuilder >> copyAll: aCollection to: aDirectory [
 
 	aCollection do: [ :each | 
-		| ref |
-		ref := each asFileReference.
-		ref copyTo: (aDirectory asFileReference ensureCreateDirectory) / ref basename ]
+		| origin dest |
+		origin := each asFileReference.
+		dest := (aDirectory asFileReference ensureCreateDirectory) / origin basename.
+		dest ensureDelete.
+		origin copyTo: dest ]
 ]
 
 { #category : 'actions' }
