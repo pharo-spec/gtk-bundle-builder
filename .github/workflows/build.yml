@@ -30,7 +30,7 @@ jobs:
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install GTK4
-        run: brew install gtk4 gtksourceview5
+        run: brew install gtk4 gtksourceview5 libadwaita
 
       - uses: demarey/pharo-setup-gha@main
         with:
