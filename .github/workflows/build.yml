@@ -17,8 +17,15 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # Use ARM64 Apple Silicon
-    runs-on: macos-latest
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-13
+            suffix: intel
+          - os: macos-latest
+            suffix: arm
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -38,17 +45,17 @@ jobs:
 
       - name: Run Pharo
         run: |
-          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #MacBundleBuilder) makeGTK4BundleARM"
+          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #MacBundleBuilder) makeGTK4Bundle${{ matrix.suffix == 'arm' && 'ARM' || '' }}"
           
           ls -R
-          cp -R pharo-vm pharo-arm-vm
-          cp gtk4/* pharo-arm-vm/Pharo.app/Contents/MacOS/Plugins/
-          codesign --remove-signature pharo-arm-vm/Pharo.app
-          codesign --force --deep --sign - pharo-arm-vm/Pharo.app
+          cp -R pharo-vm pharo-${{ matrix.suffix }}-vm
+          cp gtk4/* pharo-${{ matrix.suffix }}-vm/Pharo.app/Contents/MacOS/Plugins/
+          codesign --remove-signature pharo-${{ matrix.suffix }}-vm/Pharo.app
+          codesign --force --deep --sign - pharo-${{ matrix.suffix }}-vm/Pharo.app
 
       - name: Archive VM
         uses: actions/upload-artifact@v4
         with:
-          name: pharo-gtk4-arm-vm
-          path: pharo-arm-vm/*.app
+          name: pharo-gtk4-${{ matrix.suffix }}-vm
+          path: pharo-${{ matrix.suffix }}-vm/*.app
 
