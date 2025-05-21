@@ -1,8 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
@@ -13,9 +10,7 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -23,12 +18,15 @@ jobs:
       matrix:
         include:
           - os: macos-13
-            suffix: intel
+            arch: x86_64
           - os: macos-latest
-            suffix: arm
+            arch: arm64
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Set VM name
+        run: echo "VM_DIR=pharo-vm-Darwin-${{ matrix.arch }}-gtk-stable" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -45,17 +43,17 @@ jobs:
 
       - name: Run Pharo
         run: |
-          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #MacBundleBuilder) makeGTK4Bundle${{ matrix.suffix == 'arm' && 'ARM' || '' }}"
+          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #MacBundleBuilder) makeGTK4Bundle${{ matrix.arch == 'arm64' && 'ARM' || '' }}"
           
           ls -R
-          cp -R pharo-vm pharo-${{ matrix.suffix }}-vm
-          cp gtk4/* pharo-${{ matrix.suffix }}-vm/Pharo.app/Contents/MacOS/Plugins/
-          codesign --remove-signature pharo-${{ matrix.suffix }}-vm/Pharo.app
-          codesign --force --deep --sign - pharo-${{ matrix.suffix }}-vm/Pharo.app
+          cp -R pharo-vm $VM_DIR
+          cp gtk4/* $VM_DIR/Pharo.app/Contents/MacOS/Plugins/
+          codesign --remove-signature $VM_DIR/Pharo.app
+          codesign --force --deep --sign - $VM_DIR/Pharo.app
 
       - name: Archive VM
         uses: actions/upload-artifact@v4
         with:
-          name: pharo-gtk4-${{ matrix.suffix }}-vm
-          path: pharo-${{ matrix.suffix }}-vm/*.app
+          name: pharo-vm-Darwin-${{ matrix.arch }}-gtk-stable
+          path: pharo-vm-Darwin-${{ matrix.arch }}-gtk-stable/*.app
 
