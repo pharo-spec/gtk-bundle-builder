@@ -40,6 +40,7 @@ jobs:
       - uses: demarey/pharo-setup-gha@main
         with:
           version: 13
+          vmUrl: https://files.pharo.org/vm/pharo-spur64-headless/Darwin-${{ matrix.arch }}/latest10.zip
 
       - name: Run Pharo
         run: |
