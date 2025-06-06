@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-osx:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -58,3 +58,49 @@ jobs:
           name: pharo-vm-Darwin-${{ matrix.arch }}-gtk-stable
           path: pharo-vm-Darwin-${{ matrix.arch }}-gtk-stable/*.app
 
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest
+    env:
+      VM_NAME: pharo-vm-Windows-x86_64-gtk-stable
+      
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANG64
+          update: true
+
+      - name: Install GTK4
+        shell: msys2 {0}
+        run: |
+          pacman --noconfirm -S mingw-w64-clang-x86_64-gtk4 mingw-w64-clang-x86_64-libadwaita mingw-w64-clang-x86_64-gtksourceview5
+          MSYS2_PATH=$(cygpath -m /)
+          echo "MSYS2 is installed at: $MSYS2_PATH"
+          echo "MSYS2_PATH=$MSYS2_PATH" >> $GITHUB_ENV
+          ls -R "$MSYS2_PATH"
+
+      - uses: demarey/pharo-setup-gha@main
+        with:
+          version: 13
+          useBashOnWindows: true
+          vmUrl: https://files.pharo.org/vm/pharo-spur64-headless/Windows-x86_64/latest10.zip
+  
+      - name: Run Pharo
+        run: |
+          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #WindowsBundleBuilder) makeGTK4BundleFromDir: '$MSYS2_PATH\clang64'"
+          cp -R pharo-vm $VM_NAME
+          ls -R
+          cp -f gtk4/* $VM_NAME/
+          ls -R
+        shell: bash
+  
+      - name: Archive VM
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.VM_NAME }}
+          path: ${{ env.VM_NAME }}
