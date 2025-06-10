@@ -120,10 +120,15 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R artifacts
 
+      - name: Zip downloaded archives
+        run: |
+          cd artifacts
+          for dir in */ ; do
+            # Remove trailing slash and create a zip with the folder name
+            zip -r "../${dir%/}.zip" "$dir"
+          done
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+          files: ./*.zip
