@@ -124,8 +124,10 @@ jobs:
         run: |
           cd artifacts
           for dir in */ ; do
-            # Remove trailing slash and create a zip with the folder name
-            zip -r "../${dir%/}.zip" "$dir"
+            dir_name="${dir%/}" # Remove trailing slash
+            (
+                cd "$dir" && zip -r "../../${dir_name}.zip" .
+            )
           done
 
       - name: Create Release
