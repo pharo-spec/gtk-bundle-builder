@@ -132,3 +132,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./*.zip
+          body: |
+            These bundles provide Pharo VM with GTK support: GTK libs are shipped within the bundles.
+            
+            Warning: Release artefacts below are not signed nor notarized and by consequence, are not recognized as safe by Operating Systems.
+            You can still use them but the prefered way is to download signed and notarized installers from https://files.pharo.org/get-files/<pharo-version>/
