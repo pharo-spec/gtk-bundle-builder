@@ -61,7 +61,7 @@ jobs:
 
   build-windows:
     name: Build on Windows
-    runs-on: windows-latest
+    runs-on: windows-2025
     env:
       VM_NAME: pharo-vm-Windows-x86_64-gtk-stable
       
