@@ -38,7 +38,7 @@ jobs:
       - name: Install GTK4
         run: brew install gtk4 gtksourceview5 libadwaita
 
-      - uses: demarey/pharo-setup-gha@main
+      - uses: pharo-project/pharo-setup-gha@main
         with:
           version: 13
           vmUrl: https://files.pharo.org/vm/pharo-spur64-headless/Darwin-${{ matrix.arch }}/latest10.zip
@@ -85,7 +85,7 @@ jobs:
           echo "MSYS2_PATH=$MSYS2_PATH" >> $GITHUB_ENV
           ls -R "$MSYS2_PATH"
 
-      - uses: demarey/pharo-setup-gha@main
+      - uses: pharo-project/pharo-setup-gha@main
         with:
           version: 13
           useBashOnWindows: true
