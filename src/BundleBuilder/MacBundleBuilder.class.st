@@ -64,14 +64,23 @@ MacBundleBuilder >> bundlePath: aString [
 MacBundleBuilder >> collectNoSystemLibsOf: aDll excluding: aCollection [
 	| result |
 	
-	result := LibC resultOfCommand: 'otool -L ', aDll.
+	result := LibC resultOfCommand: 'otool -L ' , aDll.
 	^ result lines allButFirst
-		collect: [ :each | ((each trimmed substrings: ' ') collect: #trimmed) first ]
-		thenReject: [ :aName | 
-			(aCollection includes: aName) 
-			or: [ (aName beginsWith: '/System/')
-			or: [ aName beginsWith: '/usr/lib/' ] ] ].
+		  collect: [ :each | ((each trimBoth substrings: ' ') collect: #trimBoth) first ]
+		  thenReject: [ :aName | 
+				(aCollection includes: aName) 
+					or: [ (aName beginsWith: '/System/') 
+						or: [ aName beginsWith: '/usr/lib/' ] ] ]
+]
 
+{ #category : 'accessing' }
+MacBundleBuilder >> copy: fileString withDependenciesTo: destinationString [
+	"to be used when working with a single file (e.g. one i just built)"
+	| dependencies |
+
+	dependencies := Set new.
+	self deepCollectDependenciesOf: fileString into: dependencies.
+	
 ]
 
 { #category : 'actions' }
@@ -147,50 +156,58 @@ MacBundleBuilder >> fixRPathsOn: aDirectory [
 ]
 
 { #category : 'private' }
-MacBundleBuilder >> fixRPathsOnDll: aFileReference [ 
+MacBundleBuilder >> fixRPathsOnDll: aFileReference [
 	| libs result |
-	
+
 	result := LibC resultOfCommand: ('install_name_tool -id @executable_path/Plugins/{1} {2}' format: {
 		aFileReference basename.
 		aFileReference fullName }).
-	result trimmed ifNotEmpty: [ 
-		self error: 'Can''t change @id of ', aFileReference fullName ].
-		
+	result trimBoth ifNotEmpty: [ 
+		self error: 'Can''t change @id of ' , aFileReference fullName ].
+
 	libs := self collectNoSystemLibsOf: aFileReference fullName excluding: #().
 	libs := libs reject: [ :each | each beginsWith: '@executable_path' ].
 	libs 
 		collect: [ :each | each asFileReference ] 
-		thenDo: [ :each | 
+		thenDo: [ :each |
 			| command |
-			command := 'install_name_tool -change {1} @executable_path/{2} {3}' format: { 
+			
+			"change path as it is (full path)"
+			command := 'install_name_tool -change {1} @executable_path/{2} {3}' format: {
 				each fullName.
-				self toBundlePath: each basename.
+				(self toBundlePath: each basename).
 				aFileReference fullName }.
 			result := LibC resultOfCommand: command.
-			result trimmed ifNotEmpty: [ 
-				self error: 'Can''t change @rpath of ', aFileReference fullName ] ]
+			result trimBoth ifNotEmpty: [ self error: 'Can''t change @rpath of ' , aFileReference fullName ].
+				
+			each basename = aFileReference basename ifFalse: [	
+				"change path in case it arrives as @rpath"
+				command := 'install_name_tool -change @rpath/{1} @executable_path/{2} {3}' format: {
+					each basename.
+					(self toBundlePath: each basename).
+					aFileReference fullName }.
+				result := LibC resultOfCommand: command.
+				result trimBoth ifNotEmpty: [ self error: 'Can''t change @rpath of ' , aFileReference fullName ] ] ]
 ]
 
 { #category : 'private' }
 MacBundleBuilder >> makeLinkOf: aName as: destName in: aDirectory [
-	| result |
 
+	| result |
 	(aDirectory / destName) exists ifTrue: [ ^ self ].
 
-	result := LibC resultOfCommand: ('cd {1} && ln -s {2} {3}' format: { 
-		aDirectory fullName.
-		aName.
-		destName.
-	 }).
-	
-	result trimmed ifNotEmpty: [ 
-		self error: 'Can''t create link: ', result ]
+	result := LibC resultOfCommand: ('cd {1} && ln -s {2} {3}' format: {
+				           aDirectory fullName.
+				           aName.
+				           destName }).
+
+	result trimBoth ifNotEmpty: [ self error: 'Can''t create link: ' , result ]
 ]
 
 { #category : 'private' }
 MacBundleBuilder >> realPathOfSymlink: aReference [
 
-	^  (LibC resultOfCommand: 'realpath ', aReference fullName) trimmed asFileReference
+	^ (LibC resultOfCommand: 'realpath ' , aReference fullName) trimBoth asFileReference
 ]
 
 { #category : 'private' }
@@ -205,5 +222,7 @@ MacBundleBuilder >> toBundlePath: aString [
 MacBundleBuilder >> toCPath: aDll [
 	
 	aDll first = $/ ifTrue: [ ^ aDll ].
-	^  self basePath, '/', aDll
+	^  self basePath, '/', ((aDll beginsWith: '@rpath/')
+		ifTrue: [ aDll allButFirst: 7 ]
+		ifFalse: [ aDll ])
 ]
