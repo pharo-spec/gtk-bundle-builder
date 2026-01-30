@@ -36,7 +36,7 @@ jobs:
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install GTK4
-        run: brew install gtk4 gtksourceview5 libadwaita
+        run: brew install gtk4 gtksourceview5 libadwaita libpanel
 
       - uses: pharo-project/pharo-setup-gha@main
         with:
@@ -79,7 +79,7 @@ jobs:
       - name: Install GTK4
         shell: msys2 {0}
         run: |
-          pacman --noconfirm -S mingw-w64-clang-x86_64-gtk4 mingw-w64-clang-x86_64-libadwaita mingw-w64-clang-x86_64-gtksourceview5
+          pacman --noconfirm -S mingw-w64-clang-x86_64-gtk4 mingw-w64-clang-x86_64-libadwaita mingw-w64-clang-x86_64-gtksourceview5 mingw-w64-clang-x86_64-libpanel 
           MSYS2_PATH=$(cygpath -m /)
           echo "MSYS2 is installed at: $MSYS2_PATH"
           echo "MSYS2_PATH=$MSYS2_PATH" >> $GITHUB_ENV
