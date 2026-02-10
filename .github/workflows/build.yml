@@ -49,7 +49,9 @@ jobs:
           
           ls -R
           cp -R pharo-vm $VM_DIR
-          cp gtk4/* $VM_DIR/Pharo.app/Contents/MacOS/Plugins/
+          cp gtk4/*.dylib $VM_DIR/Pharo.app/Contents/MacOS/Plugins/
+          mkdir -p $VM_DIR/Pharo.app/Contents/Resources/glib-2.0/schemas
+          cp gtk4/*.compiled $VM_DIR/Pharo.app/Contents/Resources/glib-2.0/schemas/
           codesign --remove-signature $VM_DIR/Pharo.app
           codesign --force --deep --sign - $VM_DIR/Pharo.app
 
