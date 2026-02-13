@@ -22,13 +22,19 @@ Class {
 	#package : 'BundleBuilder'
 }
 
+{ #category : 'accessing' }
+MacBundleBuilder class >> baseLibraries [
+
+	^ #('libadwaita-1.0.dylib' 'libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib' 'libpanel-1.1.dylib' 'librsvg-2.2.dylib')
+]
+
 { #category : 'script' }
 MacBundleBuilder class >> makeGTK4Bundle [
 	<script>
 
 	self new
 		basePath: '/usr/local/lib';
-		baseDLLs: #('libadwaita-1.0.dylib' 'libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib' 'libpanel-1.1.dylib');
+		baseDLLs: self baseLibraries;
 		bundlePath: 'Plugins';
 		copyAllDependenciesTo: 'gtk4';
 		fixRPathsOn: 'gtk4';
@@ -41,7 +47,7 @@ MacBundleBuilder class >> makeGTK4BundleARM [
 
 	self new
 		basePath: '/opt/homebrew/lib';
-		baseDLLs: #('libadwaita-1.0.dylib' 'libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib' 'libpanel-1.1.dylib');
+		baseDLLs: self baseLibraries;
 		bundlePath: 'Plugins';
 		copyAllDependenciesTo: 'gtk4';
 		fixRPathsOn: 'gtk4';

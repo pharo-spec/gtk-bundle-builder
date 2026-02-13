@@ -36,7 +36,7 @@ jobs:
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install GTK4
-        run: brew install gtk4 gtksourceview5 libadwaita libpanel
+        run: brew install gtk4 gtksourceview5 libadwaita libpanel librsvg
 
       - uses: pharo-project/pharo-setup-gha@main
         with:
