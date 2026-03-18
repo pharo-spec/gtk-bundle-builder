@@ -81,7 +81,7 @@ jobs:
       - name: Install GTK4
         shell: msys2 {0}
         run: |
-          pacman --noconfirm -S mingw-w64-clang-x86_64-gtk4 mingw-w64-clang-x86_64-libadwaita mingw-w64-clang-x86_64-gtksourceview5 mingw-w64-clang-x86_64-libpanel mingw-w64-clang-x86_64-libarchive
+          pacman --noconfirm -S mingw-w64-clang-x86_64-gtk4 mingw-w64-clang-x86_64-libadwaita mingw-w64-clang-x86_64-gtksourceview5 mingw-w64-clang-x86_64-libpanel mingw-w64-clang-x86_64-angleproject mingw-w64-clang-x86_64-libarchive
           MSYS2_PATH=$(cygpath -m /)
           echo "MSYS2 is installed at: $MSYS2_PATH"
           echo "MSYS2_PATH=$MSYS2_PATH" >> $GITHUB_ENV
