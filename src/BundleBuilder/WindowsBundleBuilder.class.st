@@ -21,7 +21,7 @@ Class {
 WindowsBundleBuilder class >> makeGTK4Bundle [
 	<script>
 
-	self makeGTK4BundleFromDir: 'c:\msys64\clang64\bin'
+	self makeGTK4BundleFromDir: 'c:\msys64\clang64'
 ]
 
 { #category : 'script' }
@@ -29,9 +29,17 @@ WindowsBundleBuilder class >> makeGTK4BundleFromDir: msysRootDir [
 
 	self new
 		basePath: (msysRootDir copyReplaceAll: '/' with: '\'), '\bin';
-		baseDLLs: #('libadwaita-1-0.dll' 'libgtk-4-1.dll' 'libgtksourceview-5-0.dll');
+		baseDLLs: #(
+			"base"
+			'libadwaita-1-0.dll' 'libgtk-4-1.dll' 'libgtksourceview-5-0.dll' 
+			"needed for OpenGL"
+			'libEGL.dll' 'libGLESv2.dll'
+			"extra for Pulsar"
+			'librsvg-2-2.dll' 'libpanel-1-1.dll'
+			"extra for general use"
+			'libarchive-13.dll' );
 		copyAllDependenciesTo: 'gtk4';
-		copyAll: { msysRootDir, '/share/glib-2.0/schemas/gschemas.compiled' } to: 'gtk4'
+		copyAll: { msysRootDir, '\share\glib-2.0\schemas\gschemas.compiled' } to: 'gtk4'
 ]
 
 { #category : 'private - actions' }
