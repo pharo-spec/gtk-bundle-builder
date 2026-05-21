@@ -25,7 +25,21 @@ Class {
 { #category : 'accessing' }
 MacBundleBuilder class >> baseLibraries [
 
-	^ #('libadwaita-1.0.dylib' 'libgtk-4.1.dylib' 'libgtksourceview-5.0.dylib' 'libpanel-1.1.dylib' 'librsvg-2.2.dylib')
+	^ #(
+		'libadwaita-1.0.dylib' 
+		'libgtk-4.1.dylib' 
+		'libgtksourceview-5.0.dylib' 
+	)
+]
+
+{ #category : 'accessing' }
+MacBundleBuilder class >> fullLibraries [
+
+	^  self baseLibraries, #(
+		'libpanel-1.1.dylib' 
+		'librsvg-2.2.dylib'
+		'libvte-2.91-gtk4.0.dylib'
+	)
 ]
 
 { #category : 'script' }
@@ -51,7 +65,33 @@ MacBundleBuilder class >> makeGTK4BundleARM [
 		bundlePath: 'Plugins';
 		copyAllDependenciesTo: 'gtk4';
 		fixRPathsOn: 'gtk4';
-		copyAll: #('/opt/homebrew/share/glib-2.0/schemas/gschemas.compiled') to: 'gtk4' 		
+		copyAll: #('/opt/homebrew/share/glib-2.0/schemas/gschemas.compiled') to: 'gtk4'
+]
+
+{ #category : 'script' }
+MacBundleBuilder class >> makeGTK4BundleARMFull [
+	<script>
+
+	self new
+		basePath: '/opt/homebrew/lib';
+		baseDLLs: self fullLibraries;
+		bundlePath: 'Plugins';
+		copyAllDependenciesTo: 'gtk4';
+		fixRPathsOn: 'gtk4';
+		copyAll: #('/opt/homebrew/share/glib-2.0/schemas/gschemas.compiled') to: 'gtk4'
+]
+
+{ #category : 'script' }
+MacBundleBuilder class >> makeGTK4BundleFull [
+	<script>
+
+	self new
+		basePath: '/usr/local/lib';
+		baseDLLs: self fullLibraries;
+		bundlePath: 'Plugins';
+		copyAllDependenciesTo: 'gtk4';
+		fixRPathsOn: 'gtk4';
+		copyAll: #('/usr/local/share/glib-2.0/schemas/gschemas.compiled') to: 'gtk4'
 ]
 
 { #category : 'accessing' }
