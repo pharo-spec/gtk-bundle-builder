@@ -69,8 +69,10 @@ MacBundleBuilder >> bundlePath: aString [
 { #category : 'private' }
 MacBundleBuilder >> collectNoSystemLibsOf: aDll excluding: aCollection [
 	| result |
-	
+		
 	result := LibC resultOfCommand: 'otool -L ' , aDll.
+	result ifEmpty: [ self error: 'Library ', aDll, ' not found' ]. 
+	
 	^ result lines allButFirst
 		  collect: [ :each | ((each trimBoth substrings: ' ') collect: #trimBoth) first ]
 		  thenReject: [ :aName | 
@@ -144,8 +146,14 @@ MacBundleBuilder >> deepCollectDependenciesOf: aDll into: aCollection [
 		excluding: aCollection.
 	
 	libs do: [ :eachName |
+		| libName |
+	
+		libName := self 
+			maybeReplace: '@loader_path' 
+			in: eachName 
+			with: aDll asFileReference parent fullName.
 		self 
-			deepCollectDependenciesOf: eachName 
+			deepCollectDependenciesOf: libName 
 			into: aCollection ].
 	
 	^  aCollection
@@ -211,6 +219,44 @@ MacBundleBuilder >> makeLinkOf: aName as: destName in: aDirectory [
 ]
 
 { #category : 'private' }
+MacBundleBuilder >> maybeRemove: aPrefix from: aString [ 
+
+	^ (aString beginsWith: aPrefix)
+		ifTrue: [ aString allButFirst: aPrefix size ]
+		ifFalse: [ aString ]
+]
+
+{ #category : 'private - actions' }
+MacBundleBuilder >> maybeReplace: aPrefix in: aName with: aPath [
+
+	(aName beginsWith: aPrefix) ifFalse: [ ^ aName ].
+	
+	^ aPath, (aName allButFirst: aPrefix size)
+]
+
+{ #category : 'private' }
+MacBundleBuilder >> maybeResolve: aPrefix from: aString [ 
+	| name |
+
+	(aString beginsWith: aPrefix) ifFalse: [ ^ nil ].
+	
+	name := aString allButFirst: aPrefix size.
+	^ self obtainPathOf: name
+]
+
+{ #category : 'private' }
+MacBundleBuilder >> obtainPathOf: aName [
+	| find |
+	
+	find := LibC resultOfCommand: ('find {1} -name "{2}"' format: {
+		self basePath asFileReference parent fullName.
+		aName }).
+	find ifEmpty: [ self error: 'File ', aName, ' not found.' ].
+	
+	^ find trimBoth
+]
+
+{ #category : 'private' }
 MacBundleBuilder >> realPathOfSymlink: aReference [
 
 	^ (LibC resultOfCommand: 'realpath ' , aReference fullName) trimBoth asFileReference
@@ -225,10 +271,9 @@ MacBundleBuilder >> toBundlePath: aString [
 ]
 
 { #category : 'private' }
-MacBundleBuilder >> toCPath: aDll [
-	
-	aDll first = $/ ifTrue: [ ^ aDll ].
-	^  self basePath, '/', ((aDll beginsWith: '@rpath/')
-		ifTrue: [ aDll allButFirst: 7 ]
-		ifFalse: [ aDll ])
+MacBundleBuilder >> toCPath: aName [
+	"if is absolute path, we already have the file"	
+	aName first = $/ ifTrue: [ ^ aName ].
+
+	^  self basePath, '/', (self maybeRemove: '@rpath/' from: aName)
 ]
