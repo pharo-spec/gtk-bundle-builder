@@ -36,7 +36,7 @@ jobs:
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
       - name: Install GTK4
-        run: brew install gtk4 gtksourceview5 libadwaita libpanel librsvg libarchive
+        run: brew install gtk4 gtksourceview5 libadwaita libpanel librsvg libarchive vte3
 
       - uses: pharo-project/pharo-setup-gha@main
         with:
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run Pharo
         run: |
-          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #MacBundleBuilder) makeGTK4Bundle${{ matrix.arch == 'arm64' && 'ARM' || '' }}"
+          $PHARO --headless Pharo.image eval "Metacello new repository: 'gitlocal://./src'; baseline: 'BundleBuilder'; load. (Smalltalk globals at: #MacBundleBuilder) makeGTK4Bundle${{ matrix.arch == 'arm64' && 'ARM' || '' }}Full"
           
           ls -R
           cp -R pharo-vm $VM_DIR
