@@ -192,6 +192,10 @@ MacBundleBuilder >> deepCollectDependenciesOf: aDll into: aCollection [
 			maybeReplace: '@loader_path' 
 			in: eachName 
 			with: aDll asFileReference parent fullName.
+		libName := self 
+			maybeReplace: '@rpath' 
+			in: libName 
+			with: self basePath.
 		self 
 			deepCollectDependenciesOf: libName 
 			into: aCollection ].
