@@ -30,9 +30,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install brew
-        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
       - name: Install GTK4
         run: brew install gtk4 gtksourceview5 libadwaita libpanel librsvg libarchive vte3
 
